@@ -8,10 +8,9 @@ const prefixPath = (s: string) =>
     : path.resolve(s);
 
 export const VIEWER_FOLDER = path.resolve("./viewer/build");
-export const DATA_FOLDER = path.resolve("./data");
+export const DATA_FOLDER = path.resolve("./csv");
 export const SERVER_PORT =
   parseInt((process as any).env.SERVER_PORT, 10) || 4001;
 export const CONFIG_FILE = prefixPath("config.json");
-export const DB_FILE = prefixPath("db.json");
 
 export const SEARCH_VALUE_ANY = "@@SEARCH_VALUE_ANY@@";

@@ -1,10 +1,12 @@
 import React from "react";
+import * as _ from "lodash";
 import { connect, ConnectedProps } from "react-redux";
 import { SEARCH_VALUE_ANY } from "../common/constants";
 import { median } from "../common/number";
 import { E3Record } from "../common/types";
 import { RootState } from "../redux";
 import { apiCall } from "../redux/api/actions";
+import { MILLISECONDS_IN_SECOND } from "../common/time";
 
 const mapState = (state: RootState) => ({
   searchResults: state.api.e3search.value as E3Record[],
@@ -43,8 +45,30 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
   const [decisionDate, setDecisionDate] = React.useState("");
 
   React.useEffect(() => {
-    onSearch(employerName, jobTitle, worksiteCity, worksiteState, decisionDate);
+    doSearch(employerName, jobTitle, worksiteCity, worksiteState, decisionDate);
   }, [employerName, jobTitle, worksiteCity, worksiteState, decisionDate]);
+
+  const doSearch = React.useCallback(
+    _.debounce(
+      (
+        _employerName: string,
+        _jobTitle: string,
+        _worksiteCity: string,
+        _worksiteState: string,
+        _decisionDate: string,
+      ) => {
+        onSearch(
+          _employerName,
+          _jobTitle,
+          _worksiteCity,
+          _worksiteState,
+          _decisionDate,
+        );
+      },
+      MILLISECONDS_IN_SECOND,
+    ),
+    [],
+  );
 
   const handleChangeEmployerName = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -201,7 +225,7 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
             </tbody>
           </table>
         </>
-      ) : null}
+      ) : <b>No results</b>}
     </>
   );
 };

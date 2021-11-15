@@ -5,6 +5,8 @@ import { MILLISECONDS_IN_SECOND, now } from "../common/time";
 import { E3Record, SearchArgs } from "../common/types";
 import { recordMatch, records } from "../utils/e3db";
 
+export const MAX_RECORDS_TO_RETURN = 10000
+
 export const registerE3DbRoutes = async (app: Application) => {
   app.get(
     "/search/:employerName/:jobTitle/:worksiteCity/:worksiteState/:decisionDate",
@@ -44,7 +46,7 @@ export const registerE3DbRoutes = async (app: Application) => {
         )})`,
       );
 
-      res.send(JSON.stringify(ret.slice(0, 1000)));
+      res.send(JSON.stringify(ret.slice(0, MAX_RECORDS_TO_RETURN)));
     },
   );
 };

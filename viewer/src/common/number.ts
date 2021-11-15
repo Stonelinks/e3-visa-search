@@ -11,11 +11,11 @@ export const isPositiveNumeric = (value: string) => {
 export const median = (n: number[]) => {
   if (n.length === 0) return 0;
 
-  n.sort(function(a, b) {
+  n.sort((a, b) => {
     return a - b;
   });
 
-  var half = Math.floor(n.length / 2);
+  const half = Math.floor(n.length / 2);
 
   if (n.length % 2) return n[half];
 
