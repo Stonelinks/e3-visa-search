@@ -4,7 +4,9 @@ import * as express from "express";
 import * as url from "url";
 import { SERVER_PORT, VIEWER_FOLDER } from "./common/constants";
 import { registerConfigRoutes } from "./routes/config";
+import { registerE3DbRoutes } from "./routes/e3db";
 import { initConfig } from "./utils/config";
+import { initE3Db } from "./utils/e3db";
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.get("/ping", (req, res) => {
 (async () => {
   try {
     await initConfig();
+    await initE3Db();
+    await registerE3DbRoutes(app);
     await registerConfigRoutes(app);
   } catch (e) {
     console.error(e);

@@ -13,6 +13,7 @@ export interface ApiRequest {
 export interface ApiStoreState {
   getConfig: ApiRequest;
   setConfigValue: ApiRequest;
+  e3search: ApiRequest;
 }
 
 export type ApiResource = keyof ApiStoreState;

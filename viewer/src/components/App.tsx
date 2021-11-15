@@ -2,6 +2,7 @@ import React from "react";
 import { apiFetch } from "../utils/api";
 import { frontendPath, isLocalhost, reload } from "../utils/url";
 import ConfigEditor from "./ConfigEditor";
+import E3DbSearch from "./E3DbSearch";
 
 // tslint:disable-next-line:no-var-requires
 const { Match, MatchFirst } = require("react-location");
@@ -44,7 +45,7 @@ const App = () => {
         <div>
           <div style={{ display: "flex", borderBottom: "1px solid black" }}>
             <div style={{ flex: "1" }}>
-              <h1>e3-visa-search</h1>
+              <h1>E3 visa search</h1>
             </div>
           </div>
           {/* <div>
@@ -56,7 +57,7 @@ const App = () => {
               {/* <Match path={frontendPath("controls")}>
               </Match> */}
               <Match path={frontendPath("/")}>
-                <ConfigEditor />
+                <E3DbSearch />
               </Match>
             </MatchFirst>
           </div>

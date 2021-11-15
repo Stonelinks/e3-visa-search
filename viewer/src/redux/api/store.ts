@@ -12,6 +12,9 @@ const makeRequestInitialState = (url: string): ApiRequest => ({
 const InitialAPIReducerState: ApiStoreState = {
   getConfig: makeRequestInitialState("config/get"),
   setConfigValue: makeRequestInitialState("config/:configKey/set/:configValue"),
+  e3search: makeRequestInitialState(
+    "search/:employerName/:jobTitle/:worksiteCity/:worksiteState/:decisionDate",
+  ),
 };
 
 const ApiStore = (

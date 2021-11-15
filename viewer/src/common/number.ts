@@ -7,3 +7,17 @@ export const isNumeric = (value: string) => {
 export const isPositiveNumeric = (value: string) => {
   return /^\d+$/.test(value);
 };
+
+export const median = (n: number[]) => {
+  if (n.length === 0) return 0;
+
+  n.sort(function(a, b) {
+    return a - b;
+  });
+
+  var half = Math.floor(n.length / 2);
+
+  if (n.length % 2) return n[half];
+
+  return (n[half - 1] + n[half]) / 2.0;
+};
