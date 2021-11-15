@@ -1,11 +1,12 @@
 import { Application } from "express";
-import { SEARCH_VALUE_ANY } from "../common/constants";
+import {
+  MAX_SEARCH_RECORDS_TO_RETURN,
+  SEARCH_VALUE_ANY,
+} from "../common/constants";
 import { decode } from "../common/encode";
 import { MILLISECONDS_IN_SECOND, now } from "../common/time";
 import { E3Record, SearchArgs } from "../common/types";
 import { recordMatch, records } from "../utils/e3db";
-
-export const MAX_RECORDS_TO_RETURN = 10000
 
 export const registerE3DbRoutes = async (app: Application) => {
   app.get(
@@ -46,7 +47,7 @@ export const registerE3DbRoutes = async (app: Application) => {
         )})`,
       );
 
-      res.send(JSON.stringify(ret.slice(0, MAX_RECORDS_TO_RETURN)));
+      res.send(JSON.stringify(ret.slice(0, MAX_SEARCH_RECORDS_TO_RETURN)));
     },
   );
 };

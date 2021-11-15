@@ -19,3 +19,9 @@ export const median = (n: number[]) => {
 
   return (n[half - 1] + n[half]) / 2.0;
 };
+
+export const formatNumber = (n: number) =>
+  n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+export const parseCurrencyStr = (s: string) =>
+  Number(s.replace(/[^0-9.-]+/g, ""));

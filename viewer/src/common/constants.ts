@@ -14,3 +14,4 @@ export const SERVER_PORT =
 export const CONFIG_FILE = prefixPath("config.json");
 
 export const SEARCH_VALUE_ANY = "@@SEARCH_VALUE_ANY@@";
+export const MAX_SEARCH_RECORDS_TO_RETURN = 10000;

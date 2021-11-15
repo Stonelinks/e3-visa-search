@@ -1,8 +1,11 @@
 import React from "react";
 import * as _ from "lodash";
 import { connect, ConnectedProps } from "react-redux";
-import { SEARCH_VALUE_ANY } from "../common/constants";
-import { median } from "../common/number";
+import {
+  MAX_SEARCH_RECORDS_TO_RETURN,
+  SEARCH_VALUE_ANY,
+} from "../common/constants";
+import { formatNumber, median, parseCurrencyStr } from "../common/number";
 import { E3Record } from "../common/types";
 import { RootState } from "../redux";
 import { apiCall } from "../redux/api/actions";
@@ -38,6 +41,7 @@ interface OwnProps {}
 type Props = PropsFromRedux & OwnProps;
 
 const E3DbSearch = ({ searchResults, onSearch }: Props) => {
+  const [busy, setBusy] = React.useState(true);
   const [employerName, setEmployerName] = React.useState("");
   const [jobTitle, setJobTitle] = React.useState("");
   const [worksiteCity, setWorksiteCity] = React.useState("");
@@ -50,20 +54,22 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
 
   const doSearch = React.useCallback(
     _.debounce(
-      (
+      async (
         _employerName: string,
         _jobTitle: string,
         _worksiteCity: string,
         _worksiteState: string,
         _decisionDate: string,
       ) => {
-        onSearch(
+        setBusy(true);
+        await onSearch(
           _employerName,
           _jobTitle,
           _worksiteCity,
           _worksiteState,
           _decisionDate,
         );
+        setBusy(false);
       },
       MILLISECONDS_IN_SECOND,
     ),
@@ -160,72 +166,94 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
         </div>
       </div>
 
-      {searchResults && searchResults.length ? (
+      {busy ? (
+        <b>Please wait, searching...</b>
+      ) : (
         <>
-          <div style={{ marginBottom: "30px" }}>
-            <div>
-              <b>{"Number of records: "}</b>
-              {searchResults.length}
-            </div>
-            <div>
-              <b>{"Median salary: "}</b>
-              {"$" +
-                median(
-                  searchResults.map((r: E3Record) => {
-                    return Number(
-                      r.wageRateOfPayFrom.replace(/[^0-9.-]+/g, ""),
-                    );
-                  }),
-                )
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </div>
-          </div>
+          {searchResults && searchResults.length ? (
+            <>
+              <div style={{ marginBottom: "30px" }}>
+                <div>
+                  <b>{"Number of records: "}</b>
+                  {searchResults.length === MAX_SEARCH_RECORDS_TO_RETURN
+                    ? `${formatNumber(
+                        searchResults.length,
+                      )} (max results, please narrow down your search)`
+                    : formatNumber(searchResults.length)}
+                </div>
+                <div>
+                  <b>{"Median salary: "}</b>
+                  {"$" +
+                    formatNumber(
+                      median(
+                        searchResults.map((r: E3Record) =>
+                          parseCurrencyStr(r.wageRateOfPayFrom),
+                        ),
+                      ),
+                    )}
+                </div>
+              </div>
 
-          <table style={{ width: "100%", border: "1px solid black" }}>
-            <thead>
-              <tr>
-                <th style={{ border: "1px solid black" }}>{"Employer name"}</th>
-                <th style={{ border: "1px solid black" }}>{"Job title"}</th>
-                <th style={{ border: "1px solid black" }}>
-                  {"Wage rate of pay from"}
-                </th>
-                <th style={{ border: "1px solid black" }}>{"Worksite city"}</th>
-                <th style={{ border: "1px solid black" }}>
-                  {"Worksite state"}
-                </th>
-                <th style={{ border: "1px solid black" }}>{"Begin date"}</th>
-                <th style={{ border: "1px solid black" }}>{"Case status"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {searchResults.map((r: E3Record) => {
-                return (
+              <table style={{ width: "100%", border: "1px solid black" }}>
+                <thead>
                   <tr>
-                    <td style={{ border: "1px solid black" }}>
-                      {r.employerName}
-                    </td>
-                    <td style={{ border: "1px solid black" }}>{r.jobTitle}</td>
-                    <td style={{ border: "1px solid black" }}>
-                      {r.wageRateOfPayFrom}
-                    </td>
-                    <td style={{ border: "1px solid black" }}>
-                      {r.worksiteCity}
-                    </td>
-                    <td style={{ border: "1px solid black" }}>
-                      {r.worksiteState}
-                    </td>
-                    <td style={{ border: "1px solid black" }}>{r.beginDate}</td>
-                    <td style={{ border: "1px solid black" }}>
-                      {r.caseStatus}
-                    </td>
+                    <th style={{ border: "1px solid black" }}>
+                      {"Employer name"}
+                    </th>
+                    <th style={{ border: "1px solid black" }}>{"Job title"}</th>
+                    <th style={{ border: "1px solid black" }}>
+                      {"Wage rate of pay from"}
+                    </th>
+                    <th style={{ border: "1px solid black" }}>
+                      {"Worksite city"}
+                    </th>
+                    <th style={{ border: "1px solid black" }}>
+                      {"Worksite state"}
+                    </th>
+                    <th style={{ border: "1px solid black" }}>
+                      {"Begin date"}
+                    </th>
+                    <th style={{ border: "1px solid black" }}>
+                      {"Case status"}
+                    </th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {searchResults.map((r: E3Record) => {
+                    return (
+                      <tr>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.employerName}
+                        </td>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.jobTitle}
+                        </td>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.wageRateOfPayFrom}
+                        </td>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.worksiteCity}
+                        </td>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.worksiteState}
+                        </td>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.beginDate}
+                        </td>
+                        <td style={{ border: "1px solid black" }}>
+                          {r.caseStatus}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <b>No results</b>
+          )}
         </>
-      ) : <b>No results</b>}
+      )}
     </>
   );
 };
