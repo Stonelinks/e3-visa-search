@@ -12,7 +12,10 @@ import { apiCall } from "../redux/api/actions";
 import { MILLISECONDS_IN_SECOND } from "../common/time";
 
 const mapState = (state: RootState) => ({
-  searchResults: state.api.e3search.value as E3Record[],
+  searchResults: state.api.e3search.value as {
+    durationMs: number;
+    results: E3Record[];
+  },
 });
 
 const mapDispatch = {
@@ -111,6 +114,8 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
     setDecisionDate(newDecisionDate);
   };
 
+  const { results, durationMs } = searchResults;
+
   return (
     <>
       <div style={{ marginBottom: "30px" }}>
@@ -170,23 +175,23 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
         <b>Please wait, searching...</b>
       ) : (
         <>
-          {searchResults && searchResults.length ? (
+          {results && results.length ? (
             <>
               <div style={{ marginBottom: "30px" }}>
                 <div>
                   <b>{"Number of records: "}</b>
-                  {searchResults.length === MAX_SEARCH_RECORDS_TO_RETURN
+                  {results.length === MAX_SEARCH_RECORDS_TO_RETURN
                     ? `${formatNumber(
-                        searchResults.length,
+                        results.length,
                       )} (max results, please narrow down your search)`
-                    : formatNumber(searchResults.length)}
+                    : formatNumber(results.length)}
                 </div>
                 <div>
                   <b>{"Median salary: "}</b>
                   {"$" +
                     formatNumber(
                       median(
-                        searchResults.map((r: E3Record) =>
+                        results.map((r: E3Record) =>
                           parseCurrencyStr(r.wageRateOfPayFrom),
                         ),
                       ),
@@ -194,7 +199,13 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
                 </div>
               </div>
 
-              <table style={{ width: "100%", border: "1px solid black" }}>
+              <table
+                style={{
+                  marginBottom: "30px",
+                  width: "100%",
+                  border: "1px solid black",
+                }}
+              >
                 <thead>
                   <tr>
                     <th style={{ border: "1px solid black" }}>
@@ -219,7 +230,7 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchResults.map((r: E3Record) => {
+                  {results.map((r: E3Record) => {
                     return (
                       <tr>
                         <td style={{ border: "1px solid black" }}>
@@ -248,6 +259,10 @@ const E3DbSearch = ({ searchResults, onSearch }: Props) => {
                   })}
                 </tbody>
               </table>
+              <div
+                style={{ marginBottom: "30px" }}
+              >{`Got results in ${durationMs /
+                MILLISECONDS_IN_SECOND} seconds`}</div>
             </>
           ) : (
             <b>No results</b>

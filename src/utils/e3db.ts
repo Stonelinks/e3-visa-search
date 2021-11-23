@@ -3,16 +3,12 @@ import { listDirectory, readFileAsync } from "./files";
 import * as neatCsv from "neat-csv";
 import { E3Record, SearchArgs } from "../common/types";
 import { MILLISECONDS_IN_SECOND, now } from "../common/time";
+import { makeCachedFn } from "./cache";
 
 export const records: E3Record[] = [];
 
-export const fieldSearch = (search: string, fullText: string) => {
-  const r = fullText.toLowerCase().includes(search.toLowerCase());
-  if (r) {
-    console.log(`${fullText} match for ${search}`);
-  }
-  return r;
-};
+export const fieldSearch = (search: string, fullText: string) =>
+  fullText.toLowerCase().includes(search.toLowerCase());
 
 export const recordMatch = (
   r: E3Record,
@@ -42,6 +38,10 @@ export const recordMatch = (
   }
   return ret;
 };
+
+export const recordSearch = makeCachedFn("recordSearch", (a: SearchArgs) =>
+  records.filter((r: E3Record) => recordMatch(r, a)),
+);
 
 export const initE3Db = async () => {
   const start = now();

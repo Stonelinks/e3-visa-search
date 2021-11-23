@@ -5,8 +5,8 @@ import {
 } from "../common/constants";
 import { decode } from "../common/encode";
 import { MILLISECONDS_IN_SECOND, now } from "../common/time";
-import { E3Record, SearchArgs } from "../common/types";
-import { recordMatch, records } from "../utils/e3db";
+import { SearchArgs } from "../common/types";
+import { recordSearch } from "../utils/e3db";
 
 export const registerE3DbRoutes = async (app: Application) => {
   app.get(
@@ -36,10 +36,12 @@ export const registerE3DbRoutes = async (app: Application) => {
         searchArgs.decisionDate = decisionDate;
       }
 
-      const ret = records.filter((r: E3Record) => recordMatch(r, searchArgs));
+      const ret = await recordSearch(searchArgs);
+
+      const durationMs = now() - start;
 
       console.log(
-        `searched and found ${ret.length} records in ${(now() - start) /
+        `searched and found ${ret.length} records in ${durationMs /
           MILLISECONDS_IN_SECOND} seconds (${JSON.stringify(
           searchArgs,
           null,
@@ -47,7 +49,12 @@ export const registerE3DbRoutes = async (app: Application) => {
         )})`,
       );
 
-      res.send(JSON.stringify(ret.slice(0, MAX_SEARCH_RECORDS_TO_RETURN)));
+      res.send(
+        JSON.stringify({
+          durationMs,
+          results: ret.slice(0, MAX_SEARCH_RECORDS_TO_RETURN),
+        }),
+      );
     },
   );
 };

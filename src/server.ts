@@ -6,6 +6,7 @@ import { SERVER_PORT, VIEWER_FOLDER } from "./common/constants";
 import { registerConfigRoutes } from "./routes/config";
 import { registerE3DbRoutes } from "./routes/e3db";
 import { initConfig } from "./utils/config";
+import { cron } from "./utils/cron";
 import { initE3Db } from "./utils/e3db";
 
 const app = express();
@@ -49,5 +50,7 @@ app.get("/ping", (req, res) => {
     app.listen(SERVER_PORT, () => {
       console.log(`server listening on ${SERVER_PORT}`);
     });
+
+    cron.start();
   }
 })();
